@@ -3,9 +3,15 @@
 Un atelier sonore conçu avec Fine Mouche et Astra : deux claviers jouables pour comparer le tempérament égal à une gamme de huit degrés par octave.
 
 - Piano tempéré : 88 touches, de 27,5 à environ 4 186 Hz.
-- Gamme « puissance 2 » : 57 touches de 32 à 4 096 Hz, soit sept octaves complètes avec le do final.
+- Gamme des harmoniques 8–16 : 57 touches de 32 à 4 096 Hz, soit sept octaves complètes avec le do final.
 - Rapports dans chaque octave : 1, 9/8, 5/4, 11/8, 3/2, 13/8, 7/4, 15/8.
 - À partir de 256 Hz : 256, 288, 320, 352, 384, 416, 448, 480, puis 512 Hz.
+
+## Nom et références
+
+« Harmoniques 8–16 » désigne une gamme déjà connue : les huit degrés entre les harmoniques 8 et 16 sont répétés à l’octave. « Puissance 2 » était notre surnom initial ; le dépôt conserve son nom `8-notes-piano-keyboard` et son adresse.
+
+[Bart Hopkin](https://barthopkin.com/otonuton-scales/) décrit cette construction et indique l’avoir rencontrée dans *Sounds of Just Intonation* de Ralph David Hill, qu’il date de 1985. [Dante Rosati](https://www.chrisvaisvil.com/wp-content/uploads/2013/06/Dante_Rosati_on_making_Harmonic_Series_Guitars.pdf) décrit également une guitare utilisant les harmoniques 8–15 dans chaque octave. Ces références attestent des usages de la gamme, sans établir son premier inventeur. Le document original de Hill n’a pas été consulté. Le do à 256 Hz est notre choix de diapason, indépendant de la structure de la gamme.
 
 ## Utilisation
 
@@ -31,9 +37,9 @@ La conversion choisit la touche la plus proche en cents. Elle préserve les ryth
 - Une table MIDI Tuning Standard Single-note Tuning Change (Universal Real-Time, programme 0) au début du morceau. Fréquences encodées avec une résolution de 1/16384 de demi-ton, erreur maximale d’environ 0,0031 cent.
 - La sélection RPN de la banque et du programme d’accordage 0 sur le canal mélodique exporté.
 
-Dans notre encodage puissance 2, MIDI 24 = 32 Hz, puis un numéro par degré, jusqu’à MIDI 80 = 4096 Hz. Le do 256 Hz est MIDI 48. Le marqueur permet à notre lecteur d’utiliser les rapports exacts. Une table MTS correspondant à nos 57 hauteurs permet également de reconnaître la gamme sans marqueur. Un lecteur externe doit prendre en charge MIDI Tuning pour restituer ces fréquences ; le marqueur texte seul ne suffit pas à un lecteur générique.
+Dans notre encodage des harmoniques 8–16, MIDI 24 = 32 Hz, puis un numéro par degré, jusqu’à MIDI 80 = 4096 Hz. Le do 256 Hz est MIDI 48. Le marqueur permet à notre lecteur d’utiliser les rapports exacts. Une table MTS correspondant à nos 57 hauteurs permet également de reconnaître la gamme sans marqueur. Un lecteur externe doit prendre en charge MIDI Tuning pour restituer ces fréquences ; le marqueur texte seul ne suffit pas à un lecteur générique. L’identifiant technique historique `power2` reste reconnu et exporté pour conserver la compatibilité avec les premiers fichiers.
 
-Exemples créés pour le projet : [tempéré](exemple-tempere.mid) et [puissance 2](exemple-puissance-2.mid). Ils reprennent la même succession de degrés dans leurs deux accordages.
+Exemples créés pour le projet : [tempéré](exemple-tempere.mid) et [harmoniques 8–16](exemple-puissance-2.mid). Ils reprennent la même succession de degrés dans leurs deux accordages. Le second lien conserve son ancien nom de fichier pour rester accessible.
 
 Référence primaire : [MIDI Association, MIDI Tuning](https://midi.org/midi-tuning-updated-specification).
 
@@ -51,7 +57,7 @@ GitHub Settings → Pages → Deploy from a branch → main → / (root).
 
 ## Pour la suite
 
-Une représentation de flûte de Pan à 256–512 Hz reste prévue. Le nom « puissance 2 » désigne le projet : les degrés de la gamme ne sont pas tous des puissances de deux.
+Une représentation de flûte de Pan à 256–512 Hz reste prévue.
 
 ## Vérifications
 

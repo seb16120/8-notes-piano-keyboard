@@ -4,7 +4,7 @@ const keyEls={equal:[],power:[]},pressed=new Map(),voices=new Set();
 let context,master,epoch=0,lastManual=null,song=null,source='equal',target='equal',mode='original';
 let converted=[],position=0,playing=false,clock=0,next=0,timer=null,playToken=0,frame=0,loadToken=0;
 const hz=f=>f.toLocaleString('fr-FR',{maximumFractionDigits:3})+' Hz';
-const scale=t=>t==='equal'?'Tempérament égal':'Puissance 2';
+const scale=t=>t==='equal'?'Tempérament égal':'Harmoniques 8–16';
 const frequencies=t=>t==='equal'?C.eq:C.power;
 const noteName=(t,i)=>t==='equal'?C.eqName(i+21):(i%8===0?'Do':'Degré '+(i%8+1));
 function heard(type){for(const t of types)$('panel-'+t).classList.toggle('is-heard',t===type);}
@@ -78,8 +78,8 @@ function refresh(){
  const result=C.convert(song.notes,source,target);converted=result.notes;
  $('source').value=source;$('original').setAttribute('aria-pressed',String(mode==='original'));$('converted').setAttribute('aria-pressed',String(mode==='converted'));heard(target);
  for(const t of types)$('panel-'+t).classList.toggle('is-origin',t===source);
- $('originHint').textContent=song.manual?'Accordage choisi manuellement.':song.tagged?(song.hasMTS?'Accordage reconnu : table MIDI Tuning'+(source==='power'?' et/ou repère de notre gamme.':'.'):'Accordage indiqué par le repère du fichier.'):'Aucun accordage reconnu : tempérament égal présumé. Tu peux modifier ce choix.';
- $('midiInfo').textContent=converted.length+' notes · lecture sur '+scale(target)+(result.clipped?(source===target?' · '+result.clipped+' notes au-delà des touches visibles, jouées à leur hauteur':' · '+result.clipped+' notes ramenées aux limites du clavier'):'')+(result.invalid?' · '+result.invalid+' notes hors de l’encodage puissance 2 exclues':'')+'. '+song.warnings.join(' ');
+ $('originHint').textContent=song.manual?'Accordage choisi manuellement.':song.tagged?(song.hasMTS?'Accordage reconnu : table MIDI Tuning'+(source==='power'?' et/ou repère Harmoniques 8–16.':'.'):'Accordage indiqué par le repère du fichier.'):'Aucun accordage reconnu : tempérament égal présumé. Tu peux modifier ce choix.';
+ $('midiInfo').textContent=converted.length+' notes · lecture sur '+scale(target)+(result.clipped?(source===target?' · '+result.clipped+' notes au-delà des touches visibles, jouées à leur hauteur':' · '+result.clipped+' notes ramenées aux limites du clavier'):'')+(result.invalid?' · '+result.invalid+' notes hors de l’encodage Harmoniques 8–16 exclues':'')+'. '+song.warnings.join(' ');
  $('seek').max=song.duration;$('play').disabled=!converted.length;$('export').disabled=!converted.length;$('seek').disabled=false;$('source').disabled=false;$('original').disabled=false;$('converted').disabled=false;time();
 }
 function load(data,title){stop();song=data;source=data.source;mode='original';$('filename').textContent=title;$('error').textContent='';lastManual=null;refresh();const n=converted[0];if(n)follow(target,[n.index]);}
@@ -108,8 +108,8 @@ $('follow').onchange=()=>{lastVisual='!';};
 $('original').onclick=()=>{pauseMidi();endManual();mode='original';clearBlue();refresh();};$('converted').onclick=()=>{pauseMidi();endManual();mode='converted';clearBlue();refresh();};
 $('source').onchange=()=>{pauseMidi();endManual();source=$('source').value;song.manual=true;position=0;clearBlue();refresh();};
 $('seek').oninput=()=>{const t=Number($('seek').value);pauseMidi();position=t;time();};
-$('demo').onclick=()=>{loadToken++;load(C.demo('equal'),'Les huit marches · exemple tempéré');};$('demoPower').onclick=()=>{loadToken++;load(C.demo('power'),'Les huit marches · exemple puissance 2');};
-$('export').onclick=()=>download(C.midiBytes(converted,target),'astra-'+(target==='power'?'puissance-2':'tempere')+'.mid');
+$('demo').onclick=()=>{loadToken++;load(C.demo('equal'),'Les huit marches · exemple tempéré');};$('demoPower').onclick=()=>{loadToken++;load(C.demo('power'),'Les huit marches · exemple harmoniques 8–16');};
+$('export').onclick=()=>download(C.midiBytes(converted,target),'astra-'+(target==='power'?'harmoniques-8-16':'tempere')+'.mid');
 $('file').onchange=async e=>{const file=e.target.files[0];if(!file)return;const token=++loadToken;pauseMidi();try{if(file.size>10*1024*1024)throw Error('Fichier trop volumineux : maximum 10 Mo.');const data=C.parseMidi(await file.arrayBuffer());if(token===loadToken)load(data,file.name);}catch(err){if(token===loadToken)$('error').textContent=err.message;}finally{e.target.value='';}};
 window.addEventListener('blur',()=>{pauseMidi();endManual();});document.addEventListener('visibilitychange',()=>{if(document.hidden){pauseMidi();endManual();}});
 heard('equal');requestAnimationFrame(()=>{follow('equal',[39]);follow('power',[24]);});
