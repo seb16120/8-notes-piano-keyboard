@@ -19,9 +19,9 @@ function sound(f,at,duration,velocity=1){
  const harmonics=$('timbre').value==='soft'?[0,1,.12,.035]:[0,1,.45,.22,.1,.055,.025];
  osc.setPeriodicWave(context.createPeriodicWave(new Float32Array(harmonics.length),new Float32Array(harmonics)));osc.frequency.value=f;
  const amp=.32*velocity;gain.gain.setValueAtTime(0,at);gain.gain.linearRampToValueAtTime(amp,at+.012);gain.gain.setTargetAtTime(amp*.53,at+.018,.25);
- if(duration!==null){gain.gain.setTargetAtTime(0,at+duration,.025);osc.stop(at+duration+.2);}
+ if(duration!==null)gain.gain.setTargetAtTime(0,at+duration,.025);
  osc.connect(gain);gain.connect(master);const v={osc,gain};voices.add(v);
- osc.onended=()=>{osc.disconnect();gain.disconnect();voices.delete(v);};osc.start(at);return v;
+ osc.onended=()=>{osc.disconnect();gain.disconnect();voices.delete(v);};osc.start(at);if(duration!==null)osc.stop(at+duration+.2);return v;
 }
 function release(v){if(!v)return;const t=context.currentTime;try{v.gain.gain.cancelScheduledValues(t);v.gain.gain.setTargetAtTime(0,t,.015);v.osc.stop(t+.12);}catch{}voices.delete(v);}
 function end(id){const v=pressed.get(id);if(!v)return;pressed.delete(id);release(v.voice);if(![...pressed.values()].some(n=>n.key===v.key))v.key.classList.remove('active');}
@@ -70,11 +70,11 @@ function timeLabel(t){return Math.floor(t/60)+':'+String(Math.floor(t%60)).padSt
 function time(){if(!song)return;const t=now();$('seek').value=t;$('time').textContent=timeLabel(t)+' / '+timeLabel(song.duration);}
 function pauseMidi(){
  playToken++;if(playing){position=now();playing=false;clearInterval(timer);cancelAnimationFrame(frame);for(const v of [...voices])release(v);clearKeys();clearBlue();}
- $('play').textContent='▶ Lire';time();
+ $('play').textContent='▶ Lire';time();if(song)$('status').textContent='Lecture en pause · '+scale(target);
 }
 function stop(){pauseMidi();endManual();if(song){position=0;time();}clearKeys();clearBlue();lastManual=null;$('status').textContent='Sons coupés.';$('comparison').textContent=$('compare').checked?'Bleu : proximité avec les notes voisines, sans les jouer.':'Correspondances bleues désactivées.';}
 function refresh(){
- if(!song)return;lastManual=null;target=mode==='original'?source:(source==='equal'?'power':'equal');
+ if(!song)return;lastManual=null;target=mode==='original'?source:(source==='equal'?'power':'equal');$('status').textContent='Prêt à lire · '+scale(target);$('comparison').textContent=$('compare').checked?'Bleu : proximité avec les notes voisines, sans les jouer.':'Correspondances bleues désactivées.';
  const result=C.convert(song.notes,source,target);converted=result.notes;
  $('source').value=source;$('original').setAttribute('aria-pressed',String(mode==='original'));$('converted').setAttribute('aria-pressed',String(mode==='converted'));heard(target);
  for(const t of types)$('panel-'+t).classList.toggle('is-origin',t===source);
@@ -99,7 +99,7 @@ function animate(){
 async function play(){
  if(playing){pauseMidi();return;}if(!song||!converted.length)return;endManual();const token=++playToken;
  try{await audio();if(token!==playToken)return;if(position>=song.duration-.01)position=0;clock=context.currentTime+.025;playing=true;next=0;lastVisual='!';lastManual=null;heard(target);$('error').textContent='';$('status').textContent='Lecture MIDI · '+scale(target);$('play').textContent='Ⅱ Pause';schedule();timer=setInterval(schedule,35);animate();}
- catch(e){$('error').textContent='Lecture indisponible : '+e.message;}
+ catch(e){pauseMidi();$('error').textContent='Lecture indisponible : '+e.message;}
 }
 function download(bytes,file){const url=URL.createObjectURL(new Blob([bytes],{type:'audio/midi'}));const a=document.createElement('a');a.href=url;a.download=file;a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);}
 $('volume').oninput=volume;$('timbre').onchange=()=>{pauseMidi();endManual();};$('stop').onclick=stop;$('play').onclick=play;
